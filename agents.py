@@ -54,8 +54,8 @@ financial_analyst=Agent(
     ),
     tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
-    max_iter=10,
-    max_rpm=10,
+    max_iter=1,
+    max_rpm=1,
     allow_delegation=True  # Allow delegation to other specialists
 )
 
@@ -75,8 +75,8 @@ verifier = Agent(
     ),
     tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
-    max_iter=10,
-    max_rpm=10,
+    max_iter=1,
+    max_rpm=1,
     allow_delegation=True
 )
 
@@ -98,8 +98,8 @@ investment_advisor = Agent(
     ),
     tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
-    max_iter=10,
-    max_rpm=10,
+    max_iter=1,
+    max_rpm=1,
     allow_delegation=False
 )
 
@@ -119,7 +119,7 @@ More volatility means more opportunity, always!",
     ),
     tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
-    max_iter=10,
-    max_rpm=10,
+    max_iter=1,
+    max_rpm=1,
     allow_delegation=False
 )

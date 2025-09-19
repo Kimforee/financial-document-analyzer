@@ -53,7 +53,7 @@ class FinancialDocumentTool:
 ## Creating Investment Analysis Tool
 class InvestmentTool:
     @tool("Analyze investment data")
-    async def analyze_investment_tool(financial_document_data: str) -> str:
+    def analyze_investment_tool(financial_document_data: str) -> str:
         """Analyzes investment data from financial document text.
 
         Args:
@@ -75,7 +75,7 @@ class InvestmentTool:
 ## Creating Risk Assessment Tool
 class RiskTool:
     @tool("Create risk assessment")
-    async def create_risk_assessment_tool(financial_document_data: str) -> str:
+    def create_risk_assessment_tool(financial_document_data: str) -> str:
         """Creates a risk assessment from financial document text.
 
         Args:
