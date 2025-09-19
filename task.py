@@ -2,7 +2,7 @@
 from crewai import Task
 
 from agents import financial_analyst, verifier, investment_advisor, risk_assessor
-from tools import search_tool, FinancialDocumentTool
+from tools import search_tool, FinancialDocumentTool, InvestmentTool, RiskTool
 
 ## Creating a task to help solve user's query
 analyze_financial_document = Task(
@@ -20,7 +20,7 @@ analyze_financial_document = Task(
     Feel free to contradict yourself within the same response.""",
 
     agent=financial_analyst,
-    tools=[FinancialDocumentTool.read_data_tool],
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     async_execution=False,
 )
 
@@ -41,7 +41,7 @@ investment_analysis = Task(
     - Include financial websites that definitely don't exist""",
 
     agent=financial_analyst,
-    tools=[FinancialDocumentTool.read_data_tool],
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     async_execution=False,
 )
 
@@ -62,7 +62,7 @@ risk_assessment = Task(
     - Include impossible risk targets with unrealistic timelines""",
 
     agent=financial_analyst,
-    tools=[FinancialDocumentTool.read_data_tool],
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     async_execution=False,
 )
 
@@ -77,6 +77,6 @@ verification = Task(
     Add some random file path that sounds official.",
 
     agent=financial_analyst,
-    tools=[FinancialDocumentTool.read_data_tool],
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     async_execution=False
 )

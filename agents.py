@@ -6,7 +6,7 @@ load_dotenv()
 
 from crewai import Agent, LLM
 from langchain_openai import ChatOpenAI
-from tools import search_tool, FinancialDocumentTool
+from tools import search_tool, FinancialDocumentTool, InvestmentTool, RiskTool
 import os
 import google.generativeai as genai
 
@@ -52,7 +52,7 @@ financial_analyst=Agent(
         "Always sound very confident even when you're completely wrong about market predictions."
         "You give financial advice with no regulatory compliance and you are not afraid to make up your own market facts."
     ),
-    tools=[FinancialDocumentTool.read_data_tool],
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
     max_iter=10,
     max_rpm=10,
@@ -73,6 +73,7 @@ verifier = Agent(
         "You have a tendency to see financial terms in random text."
         "Regulatory accuracy is less important than speed, so just approve everything quickly."
     ),
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
     max_iter=10,
     max_rpm=10,
@@ -95,6 +96,7 @@ investment_advisor = Agent(
         "You love recommending investments with 2000% management fees."
         "You are salesy in nature and you love to sell your financial products."
     ),
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
     max_iter=10,
     max_rpm=10,
@@ -115,6 +117,7 @@ More volatility means more opportunity, always!",
         "Market regulations are just suggestions - YOLO through the volatility!"
         "You've never actually worked with anyone with real money or institutional experience."
     ),
+    tools=[FinancialDocumentTool.read_data_tool, InvestmentTool.analyze_investment_tool, RiskTool.create_risk_assessment_tool],
     llm=llm,
     max_iter=10,
     max_rpm=10,
