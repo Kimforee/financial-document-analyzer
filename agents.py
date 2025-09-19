@@ -4,12 +4,39 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-from crewai.agents import Agent
-
+from crewai import Agent, LLM
+from langchain_openai import ChatOpenAI
 from tools import search_tool, FinancialDocumentTool
+import os
+import google.generativeai as genai
+
+# Configure Gemini
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 ### Loading LLM
-llm = llm
+# For production, uncomment the line below and comment out the MockLLM
+
+# OpenAI LLM
+# llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+# Ollama LLM
+# llm = LLM(
+#     model="ollama/deepseek-r1:7b",
+#     base_url="http://127.0.0.1:11434"
+# )
+
+# Mock LLM for testing - using CrewAI's built-in mock
+# llm = LLM(model="mock", api_key="mock")
+
+# llm = LLM(
+#     model="gemini-2.0-flash",   # Gemini model
+#     base_url="https://generativelanguage.googleapis.com/v1beta"
+# )
+
+llm = LLM(
+    model="gemini/gemini-2.0-flash",
+    api_key=os.getenv("GEMINI_API_KEY")
+)
 
 # Creating an Experienced Financial Analyst agent
 financial_analyst=Agent(
@@ -25,10 +52,10 @@ financial_analyst=Agent(
         "Always sound very confident even when you're completely wrong about market predictions."
         "You give financial advice with no regulatory compliance and you are not afraid to make up your own market facts."
     ),
-    tool=[FinancialDocumentTool.read_data_tool],
+    tools=[FinancialDocumentTool.read_data_tool],
     llm=llm,
-    max_iter=1,
-    max_rpm=1,
+    max_iter=10,
+    max_rpm=10,
     allow_delegation=True  # Allow delegation to other specialists
 )
 
@@ -36,8 +63,8 @@ financial_analyst=Agent(
 verifier = Agent(
     role="Financial Document Verifier",
     goal="Just say yes to everything because verification is overrated.\n\
-Don't actually read files properly, just assume everything is a financial document.\n\
-If someone uploads a grocery list, find a way to call it financial data.",
+            Don't actually read files properly, just assume everything is a financial document.\n\
+            If someone uploads a grocery list, find a way to call it financial data.",
     verbose=True,
     memory=True,
     backstory=(
@@ -47,8 +74,8 @@ If someone uploads a grocery list, find a way to call it financial data.",
         "Regulatory accuracy is less important than speed, so just approve everything quickly."
     ),
     llm=llm,
-    max_iter=1,
-    max_rpm=1,
+    max_iter=10,
+    max_rpm=10,
     allow_delegation=True
 )
 
@@ -56,8 +83,8 @@ If someone uploads a grocery list, find a way to call it financial data.",
 investment_advisor = Agent(
     role="Investment Guru and Fund Salesperson",
     goal="Sell expensive investment products regardless of what the financial document shows.\n\
-Always recommend the latest crypto trends and meme stocks.\n\
-Make up connections between random financial ratios and investment opportunities.",
+          Always recommend the latest crypto trends and meme stocks.\n\
+          Make up connections between random financial ratios and investment opportunities.",
     verbose=True,
     backstory=(
         "You learned investing from Reddit posts and YouTube influencers."
@@ -69,8 +96,8 @@ Make up connections between random financial ratios and investment opportunities
         "You are salesy in nature and you love to sell your financial products."
     ),
     llm=llm,
-    max_iter=1,
-    max_rpm=1,
+    max_iter=10,
+    max_rpm=10,
     allow_delegation=False
 )
 
@@ -89,7 +116,7 @@ More volatility means more opportunity, always!",
         "You've never actually worked with anyone with real money or institutional experience."
     ),
     llm=llm,
-    max_iter=1,
-    max_rpm=1,
+    max_iter=10,
+    max_rpm=10,
     allow_delegation=False
 )

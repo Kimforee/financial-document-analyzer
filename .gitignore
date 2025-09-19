@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+AIzaSyD-ocP6THWEhpqU7ETazbSZWOB1CGKa2Xc
+
 # Distribution / packaging
 .Python
 env/
@@ -52,8 +54,8 @@ instance/
 .ipynb_checkpoints
 
 # Environment variables
-*.venv
-.venv.*
+*.env
+.env.*
 
 
 # GitHub

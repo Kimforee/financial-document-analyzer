@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from typing import Optional
 import os
 import uuid
 import asyncio
@@ -26,11 +27,11 @@ async def root():
     return {"message": "Financial Document Analyzer API is running"}
 
 @app.post("/analyze")
-async def analyze_financial_document(
+async def analyze_financial_document_with_file(
     file: UploadFile = File(...),
     query: str = Form(default="Analyze this financial document for investment insights")
 ):
-    """Analyze financial document and provide comprehensive investment recommendations"""
+    """Analyze uploaded financial document and provide comprehensive investment recommendations"""
     
     file_id = str(uuid.uuid4())
     file_path = f"data/financial_document_{file_id}.pdf"
@@ -55,7 +56,8 @@ async def analyze_financial_document(
             "status": "success",
             "query": query,
             "analysis": str(response),
-            "file_processed": file.filename
+            "file_processed": file.filename,
+            "file_source": "uploaded"
         }
         
     except Exception as e:
@@ -68,6 +70,40 @@ async def analyze_financial_document(
                 os.remove(file_path)
             except:
                 pass  # Ignore cleanup errors
+
+@app.post("/analyze-default")
+async def analyze_default_financial_document(
+    query: str = Form(default="Analyze this financial document for investment insights")
+):
+    """Analyze the default sample financial document and provide comprehensive investment recommendations"""
+    
+    try:
+        # Validate query
+        if query=="" or query is None:
+            query = "Analyze this financial document for investment insights"
+            
+        # Use default sample file
+        default_file_path = "data/sample.pdf"
+        
+        # Check if default file exists
+        if not os.path.exists(default_file_path):
+            raise HTTPException(status_code=404, detail=f"Default sample file not found at {default_file_path}")
+            
+        # Process the financial document with all analysts
+        response = run_crew(query=query.strip(), file_path=default_file_path)
+        
+        return {
+            "status": "success",
+            "query": query,
+            "analysis": str(response),
+            "file_processed": "sample.pdf",
+            "file_source": "default"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing financial document: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
