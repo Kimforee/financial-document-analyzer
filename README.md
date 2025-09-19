@@ -2,6 +2,10 @@
 
 ## Project Overview
 A comprehensive financial document analysis system that processes corporate reports, financial statements, and investment documents using AI-powered analysis agents.
+<img width="952" height="755" alt="image" src="https://github.com/user-attachments/assets/8d5e5c0e-9f4e-4899-a0d8-3f4980afb5e1" />
+<img width="1067" height="583" alt="image" src="https://github.com/user-attachments/assets/fd5841b4-c0a6-4ff7-bfe5-9a2d616be7dc" />
+
+
 
 ## Getting Started
 
