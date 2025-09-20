@@ -1,0 +1,14 @@
+{
+  "query": "Test analysis",
+  "file_name": "sample.pdf",
+  "analysis": "Basic analysis of sample.pdf for query: 'Test analysis'",
+  "summary": "Document contains 5387775 characters. This is a simplified analysis.",
+  "key_points": [
+    "Document processed successfully",
+    "Query: Test analysis",
+    "File: sample.pdf",
+    "Content length: 5387775 characters"
+  ],
+  "status": "completed",
+  "timestamp": "2025-09-20T11:00:07.652930"
+}
