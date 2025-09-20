@@ -67,9 +67,38 @@ class InvestmentTool:
 
         # Clean up double spaces
         processed_data = " ".join(financial_document_data.split())
-
-        # TODO: Implement actual investment analysis logic here
-        return "Investment analysis functionality to be implemented"
+        
+        # Extract key financial metrics
+        analysis = []
+        
+        # Look for revenue patterns
+        if "revenue" in processed_data.lower():
+            analysis.append("• Revenue analysis: Document contains revenue data")
+        
+        # Look for profit/loss indicators
+        if any(word in processed_data.lower() for word in ["profit", "income", "earnings", "net income"]):
+            analysis.append("• Profitability: Document contains profit/income data")
+        
+        # Look for growth indicators
+        if any(word in processed_data.lower() for word in ["growth", "increase", "decrease", "decline", "rise", "fall"]):
+            analysis.append("• Growth trends: Document contains growth/decline indicators")
+        
+        # Look for cash flow data
+        if any(word in processed_data.lower() for word in ["cash flow", "operating cash", "free cash"]):
+            analysis.append("• Cash flow: Document contains cash flow information")
+        
+        # Look for debt/liability data
+        if any(word in processed_data.lower() for word in ["debt", "liability", "borrowing", "loan"]):
+            analysis.append("• Debt analysis: Document contains debt/liability information")
+        
+        # Look for market indicators
+        if any(word in processed_data.lower() for word in ["market", "share", "stock", "equity", "valuation"]):
+            analysis.append("• Market analysis: Document contains market/share data")
+        
+        if not analysis:
+            analysis.append("• General analysis: Document contains financial data requiring detailed review")
+        
+        return "\n".join(analysis) if analysis else "No specific investment indicators found"
 
 
 ## Creating Risk Assessment Tool
@@ -89,6 +118,39 @@ class RiskTool:
 
         # Clean up double spaces
         processed_data = " ".join(financial_document_data.split())
-
-        # TODO: Implement actual risk assessment logic here
-        return "Risk assessment functionality to be implemented"
+        
+        # Risk assessment analysis
+        risks = []
+        
+        # Look for financial stress indicators
+        if any(word in processed_data.lower() for word in ["loss", "deficit", "decline", "decrease", "negative"]):
+            risks.append("• Financial stress: Document indicates potential financial losses or declines")
+        
+        # Look for debt-related risks
+        if any(word in processed_data.lower() for word in ["debt", "liability", "borrowing", "credit", "leverage"]):
+            risks.append("• Debt risk: Document contains debt/liability information requiring assessment")
+        
+        # Look for market volatility indicators
+        if any(word in processed_data.lower() for word in ["volatile", "uncertain", "risk", "challenge", "difficult"]):
+            risks.append("• Market volatility: Document indicates market uncertainty or challenges")
+        
+        # Look for regulatory/compliance risks
+        if any(word in processed_data.lower() for word in ["regulation", "compliance", "legal", "audit", "investigation"]):
+            risks.append("• Regulatory risk: Document mentions regulatory or compliance matters")
+        
+        # Look for operational risks
+        if any(word in processed_data.lower() for word in ["operational", "production", "supply", "manufacturing", "capacity"]):
+            risks.append("• Operational risk: Document contains operational information requiring risk assessment")
+        
+        # Look for competitive risks
+        if any(word in processed_data.lower() for word in ["competition", "competitive", "market share", "pricing"]):
+            risks.append("• Competitive risk: Document mentions competitive factors")
+        
+        # Look for technology risks
+        if any(word in processed_data.lower() for word in ["technology", "digital", "cyber", "innovation", "disruption"]):
+            risks.append("• Technology risk: Document contains technology-related information")
+        
+        if not risks:
+            risks.append("• General risk: Document requires comprehensive risk assessment")
+        
+        return "\n".join(risks) if risks else "No specific risk indicators identified"

@@ -10,7 +10,33 @@ from sqlalchemy.orm import Session
 
 from celery_app import celery_app
 from models import AnalysisResult, TaskQueue, SessionLocal, create_tables
-from crew_runner import crew_runner
+from single_call_runner import single_call_runner
+# from crew_runner import crew_runner
+
+def get_file_info(file_path: str) -> Dict[str, Any]:
+    """
+    Get file information
+    
+    Args:
+        file_path: Path to the file
+        
+    Returns:
+        Dictionary containing file information
+    """
+    try:
+        if not os.path.exists(file_path):
+            return {'error': 'File not found or not accessible'}
+        
+        stat = os.stat(file_path)
+        return {
+            'file_name': os.path.basename(file_path),
+            'file_size': stat.st_size,
+            'file_type': os.path.splitext(file_path)[1].lower(),
+            'created_at': datetime.fromtimestamp(stat.st_ctime).isoformat(),
+            'modified_at': datetime.fromtimestamp(stat.st_mtime).isoformat()
+        }
+    except Exception as e:
+        return {'error': f'Error getting file info: {str(e)}'}
 
 
 @celery_app.task(bind=True, name='worker_tasks.analyze_document_task')
@@ -50,8 +76,11 @@ def analyze_document_task(self, analysis_id: str, query: str, file_path: str, fi
             analysis_record.status = 'processing'
             db.commit()
         
+        # Run single call analysis (only 1 API call)
+        result = single_call_runner.run_analysis(query=query, file_path=file_path)
+
         # Run the crew analysis
-        result = crew_runner.run_crew(query=query, file_path=file_path)
+        # result = crew_runner.run_crew(query=query, file_path=file_path)
         
         # Save analysis result to file
         output_file_path = save_analysis_to_file(analysis_id, result, query)
@@ -305,7 +334,8 @@ def create_analysis_record(db: Session, file_name: str, file_path: str, query: s
     analysis_id = str(uuid.uuid4())
     
     # Get file info
-    file_info = crew_runner.get_file_info(file_path)
+    # file_info = crew_runner.get_file_info(file_path)
+    file_info = get_file_info(file_path)
     
     analysis_record = AnalysisResult(
         id=analysis_id,

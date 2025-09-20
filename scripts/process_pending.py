@@ -18,20 +18,21 @@ def process_pending_tasks():
     
     try:
         from models import SessionLocal, AnalysisResult
-        from crew_runner import crew_runner
+        # OLD: from crew_runner import crew_runner  # 4-agent system (commented for future use)
+        from single_call_runner import single_call_runner  # NEW: Single call system
         
         db = SessionLocal()
         
-        # Get all pending tasks
+        # Get all pending and processing tasks (stuck tasks)
         pending_tasks = db.query(AnalysisResult).filter(
-            AnalysisResult.status == 'pending'
+            AnalysisResult.status.in_(['pending', 'processing'])
         ).all()
         
         if not pending_tasks:
-            print("✅ No pending tasks found")
+            print("✅ No pending or processing tasks found")
             return
         
-        print(f"📋 Found {len(pending_tasks)} pending tasks")
+        print(f"📋 Found {len(pending_tasks)} pending/processing tasks")
         
         for i, task in enumerate(pending_tasks, 1):
             print(f"\n🔄 Processing task {i}/{len(pending_tasks)}")
@@ -45,7 +46,8 @@ def process_pending_tasks():
                 db.commit()
                 
                 # Run the analysis
-                result = crew_runner.run_crew(
+                # OLD: crew_runner.run_crew() - 4-agent system (commented for future use)
+                result = single_call_runner.run_analysis(
                     query=task.query,
                     file_path=task.file_path
                 )
@@ -54,7 +56,10 @@ def process_pending_tasks():
                     # Update task with results
                     task.status = 'completed'
                     task.analysis_result = result.get('result', '')
-                    task.completed_at = result.get('completed_at')
+                    # Fix: Convert string timestamp to datetime object for SQLite
+                    from datetime import datetime
+                    if result.get('completed_at'):
+                        task.completed_at = datetime.fromisoformat(result.get('completed_at').replace('Z', '+00:00'))
                     task.processing_time = result.get('processing_time', 0)
                     
                     # Save output file
@@ -64,6 +69,7 @@ def process_pending_tasks():
                     
                     print(f"   ✅ Completed successfully")
                     print(f"   ⏱️  Processing time: {result.get('processing_time', 0):.2f}s")
+                    print(f"   🔢 API calls made: {result.get('api_calls_made', 'unknown')}")
                     print(f"   📄 Output file: {output_path}")
                 else:
                     # Mark as failed
