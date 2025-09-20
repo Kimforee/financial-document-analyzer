@@ -34,24 +34,42 @@ print_info() {
 
 # Check if Python is installed
 print_info "Checking Python installation..."
-if ! command -v python3 &> /dev/null; then
-    print_error "Python 3 is not installed. Please install Python 3.8 or higher."
+
+# Try different Python commands
+PYTHON_CMD=""
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+elif command -v py &> /dev/null; then
+    PYTHON_CMD="py"
+else
+    print_error "Python is not installed or not in PATH. Please install Python 3.8 or higher."
+    print_info "Windows users: Make sure to add Python to PATH during installation"
+    print_info "Or try running: py --version"
     exit 1
 fi
 
-PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-print_status "Python $PYTHON_VERSION found"
+PYTHON_VERSION=$($PYTHON_CMD -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
+print_status "Python $PYTHON_VERSION found using '$PYTHON_CMD'"
 
 # Check if pip is installed
-if ! command -v pip3 &> /dev/null; then
-    print_error "pip3 is not installed. Please install pip."
+PIP_CMD=""
+if command -v pip3 &> /dev/null; then
+    PIP_CMD="pip3"
+elif command -v pip &> /dev/null; then
+    PIP_CMD="pip"
+else
+    print_error "pip is not installed. Please install pip."
+    print_info "Windows users: pip should come with Python installation"
     exit 1
 fi
+print_status "pip found using '$PIP_CMD'"
 
 # Create virtual environment
 print_info "Creating virtual environment..."
 if [ ! -d "venv" ]; then
-    python3 -m venv venv
+    $PYTHON_CMD -m venv venv
     print_status "Virtual environment created"
 else
     print_status "Virtual environment already exists"
@@ -64,7 +82,15 @@ print_status "Virtual environment activated"
 
 # Install dependencies
 print_info "Installing Python dependencies..."
-pip install -r requirements.txt
+
+# Detect OS and use appropriate requirements file
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]] || [[ "$OSTYPE" == "cygwin" ]]; then
+    print_info "Windows detected, using Windows-compatible requirements..."
+    $PIP_CMD install -r requirements-windows.txt
+else
+    print_info "Using standard requirements..."
+    $PIP_CMD install -r requirements.txt
+fi
 print_status "Dependencies installed"
 
 # Check if Redis is running
@@ -121,7 +147,7 @@ print_status "Environment file created"
 
 # Initialize database
 print_info "Initializing database..."
-python setup/init_db.py
+$PYTHON_CMD setup/init_db.py
 print_status "Database initialized"
 
 # Make scripts executable
@@ -134,7 +160,7 @@ print_status "Scripts made executable"
 
 # Test the setup
 print_info "Testing setup..."
-python -c "
+$PYTHON_CMD -c "
 from models import engine
 from sqlalchemy import text
 try:
