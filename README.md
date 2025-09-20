@@ -7,7 +7,7 @@ A comprehensive financial document analysis system that processes corporate repo
 <img width="1067" height="583" alt="image" src="https://github.com/user-attachments/assets/fd5841b4-c0a6-4ff7-bfe5-9a2d616be7dc" />
 
 
-## 🚀 Features
+## Features
 
 * Upload or analyze default financial documents (PDF format)
 * Multi-agent CrewAI pipeline:
@@ -15,7 +15,7 @@ A comprehensive financial document analysis system that processes corporate repo
   * **Financial Analyst** — extracts & summarizes key insights
   * **Verifier** — checks document validity
   * **Investment Advisor** — suggests opportunities
-  * **Risk Assessor** — highlights risks
+  * **Risk Assessor** — highlights risks  (financial stress, debt, volatility, regulatory, operational, competitive, technology risks)
 * Tools for:
 
   * Reading PDF content
@@ -78,8 +78,23 @@ We fixed several issues in the original codebase. See [BUGFIXES.md](./BUGFIXES.m
 
 ### Option 1: Automated Setup (Recommended)
 ```bash
-# Run the complete setup script
+# a : Run the complete setup script
 bash setup.sh
+```
+
+```bash
+# b :  Activate the environment
+source venv/bin/activate
+```
+
+```bash
+# c : Run the app after setup is complete 
+uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+```bash
+# d : If tasks are stuck in the queue free them using this 
+python scripts/process_pending.py
 ```
 
 ### Option 2: Manual Setup
@@ -91,7 +106,7 @@ bash setup.sh
 2. **Configure API Keys**:
    Edit `.env` file with your API keys:
    - `GEMINI_API_KEY`: Get from [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - `SERPER_API_KEY`: Get from [Serper](https://serper.dev/)
+   - `SERPER_API_KEY`: Get from [Serper](https://serper.dev/) (Not needed as of now)
 
 3. **Start Services**:
 ```bash
@@ -107,6 +122,7 @@ bash setup.sh
 
 4. **Test the System**:
 ```bash
+   # There are tests as well
    python tests/test_api.py
    ```
 
@@ -124,8 +140,10 @@ financial-document-analyzer-debug/
 ├── celery_app.py          # Celery configuration
 ├── worker_tasks.py        # Background tasks
 ├── crew_runner.py         # Crew execution logic
+├── single_call_runner.py  # To execute all the agents in a call so as to limit gemini api usage
 ├── agents.py              # AI agents
 ├── tools.py               # Analysis tools
+├── setup.sh               # For instant automated set up
 ├── task.py                # Task definitions
 ├── requirements.txt       # Dependencies
 ├── .env                   # Environment variables
@@ -139,7 +157,7 @@ financial-document-analyzer-debug/
 │   └── debug_connections.py
 ├── tests/                 # Test files
 │   ├── test_api.py
-│   └── test_integration.py
+│   └── test_integration.py#  more tests will be added 
 └── docs/                  # Documentation
     ├── README_SETUP.md
     ├── QUICK_START.md
@@ -161,7 +179,7 @@ financial-document-analyzer-debug/
 - **Queue**: Redis + Celery
 - **AI**: CrewAI with Gemini
 - **API**: FastAPI
-- **Storage**: Local files + Database
+- **Storage**: Local files + Database (Sqlite or Supabase(postgres))
 
 ##  License
 
