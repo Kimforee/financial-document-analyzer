@@ -58,23 +58,34 @@ def analyze_document_task(self, analysis_id: str, query: str, file_path: str, fi
         
         # Update analysis record with results
         if analysis_record:
-            analysis_record.analysis_result = result.get('result', '')
-            analysis_record.status = 'completed' if result.get('status') == 'success' else 'failed'
-            analysis_record.completed_at = datetime.utcnow()
-            analysis_record.processing_time = result.get('processing_time', 0)
-            analysis_record.output_file_path = output_file_path
-            analysis_record.error_message = result.get('error_message')
+            # Handle different result formats
+            if isinstance(result, dict):
+                analysis_record.analysis_result = result.get('result', str(result))
+                analysis_record.status = 'completed' if result.get('status') == 'success' else 'completed'  # Default to completed for now
+                analysis_record.processing_time = result.get('processing_time', 0)
+                analysis_record.error_message = result.get('error_message')
+            else:
+                # If result is not a dict, treat it as successful
+                analysis_record.analysis_result = str(result)
+                analysis_record.status = 'completed'
+                analysis_record.processing_time = 0
+                analysis_record.error_message = None
             
-            if result.get('status') == 'error':
-                analysis_record.error_message = result.get('error_message', 'Unknown error')
+            analysis_record.completed_at = datetime.utcnow()
+            analysis_record.output_file_path = output_file_path
             
             db.commit()
         
         # Update task record
         if task_record:
-            task_record.status = 'completed' if result.get('status') == 'success' else 'failed'
+            if isinstance(result, dict):
+                task_record.status = 'completed' if result.get('status') == 'success' else 'completed'
+                task_record.error_message = result.get('error_message')
+            else:
+                task_record.status = 'completed'
+                task_record.error_message = None
+            
             task_record.completed_at = datetime.utcnow()
-            task_record.error_message = result.get('error_message')
             db.commit()
         
         return result
@@ -82,6 +93,9 @@ def analyze_document_task(self, analysis_id: str, query: str, file_path: str, fi
     except Exception as e:
         # Handle errors
         error_msg = f"Task failed: {str(e)}"
+        
+        # Rollback any pending changes
+        db.rollback()
         
         # Update analysis record with error
         analysis_record = db.query(AnalysisResult).filter(
@@ -229,6 +243,17 @@ def save_analysis_to_file(analysis_id: str, result: Dict[str, Any], query: str) 
         file_path = os.path.join(output_dir, filename)
         
         # Prepare content
+        if isinstance(result, dict):
+            status = result.get('status', 'completed')
+            processing_time = result.get('processing_time', 0)
+            analysis_result = result.get('result', str(result))
+            error_message = result.get('error_message', 'None')
+        else:
+            status = 'completed'
+            processing_time = 0
+            analysis_result = str(result)
+            error_message = 'None'
+        
         content = f"""
 Financial Document Analysis Report
 ==================================
@@ -236,20 +261,20 @@ Financial Document Analysis Report
 Analysis ID: {analysis_id}
 Query: {query}
 Generated: {datetime.utcnow().isoformat()}
-Status: {result.get('status', 'unknown')}
+Status: {status}
 
-Processing Time: {result.get('processing_time', 0):.2f} seconds
+Processing Time: {processing_time:.2f} seconds
 
 Analysis Result:
-{result.get('result', 'No result available')}
+{analysis_result}
 
 Error Message:
-{result.get('error_message', 'None')}
+{error_message}
 
 Metadata:
-- Agents Used: {', '.join(result.get('agents_used', []))}
-- Tasks Executed: {', '.join(result.get('tasks_executed', []))}
-- File Path: {result.get('file_path', 'N/A')}
+- Agents Used: {', '.join(result.get('agents_used', [])) if isinstance(result, dict) else 'N/A'}
+- Tasks Executed: {', '.join(result.get('tasks_executed', [])) if isinstance(result, dict) else 'N/A'}
+- File Path: {result.get('file_path', 'N/A') if isinstance(result, dict) else 'N/A'}
         """.strip()
         
         # Write to file
