@@ -1,0 +1,60 @@
+click>=8.1.8
+
+# CrewAI core
+crewai==0.130.0
+
+# Web framework
+fastapi>=0.115.0,<1.0.0
+
+# Templates & JSON
+Jinja2==3.1.4
+jsonschema==4.22.0
+
+# LangChain ecosystem (required by CrewAI)
+langchain-core==0.1.52
+langsmith==0.1.67
+tiktoken==0.11.0
+
+# Core ML + AI clients
+numpy==1.26.4
+onnxruntime==1.22.0
+openai>=1.68.2
+
+# Data handling
+pandas==2.2.2
+pillow==10.3.0
+
+# Protobuf (safe for Google + CrewAI + ChromaDB)
+protobuf >=5.0, <6.0
+
+# Pydantic v2
+pydantic==2.11.9
+pydantic-core==2.33.2
+
+# Vector DB
+chromadb==0.5.23
+
+# OpenTelemetry (force align all to 1.30.x family)
+opentelemetry-api==1.30.0
+opentelemetry-sdk==1.30.0
+opentelemetry-exporter-otlp-proto-grpc==1.30.0
+opentelemetry-exporter-otlp-proto-http==1.30.0
+opentelemetry-exporter-otlp-proto-common==1.30.0
+opentelemetry-proto==1.30.0
+opentelemetry-semantic-conventions==0.51b0
+
+# Queue and Task Processing
+celery==5.3.1
+redis>=4.6.0
+
+# Database
+SQLAlchemy>=2.0.0
+psycopg2-binary
+alembic
+
+# Environment and Configuration
+python-dotenv
+
+# Additional dependencies for document processing
+langchain-community
+

@@ -6,21 +6,6 @@ A comprehensive financial document analysis system that processes corporate repo
 <img width="952" height="755" alt="image" src="https://github.com/user-attachments/assets/8d5e5c0e-9f4e-4899-a0d8-3f4980afb5e1" />
 <img width="1067" height="583" alt="image" src="https://github.com/user-attachments/assets/fd5841b4-c0a6-4ff7-bfe5-9a2d616be7dc" />
 
-* Setup instructions
-* API docs with curl examples
-* Bugs summary (linked to `BUGFIXES.md`)
-* Note about agents & tasks not being used originally
-* LLM + decorator fixes
-* Prompt inefficiencies fixed
-
----
-
-# 📑 Financial Document Analyzer
-
-An AI-powered system that analyzes corporate reports, financial statements, and investment documents using **CrewAI agents**.
-It extracts financial insights, performs risk assessments, verifies document validity, and generates investment recommendations.
-
----
 
 ## 🚀 Features
 
@@ -88,130 +73,96 @@ We fixed several issues in the original codebase. See [BUGFIXES.md](./BUGFIXES.m
 
 ---
 
-## ⚙️ Setup
 
-### 1. Clone repo
+##  Quick Start
 
+### Option 1: Automated Setup (Recommended)
 ```bash
-git clone https://github.com/<your-username>/financial-document-analyzer.git
-cd financial-document-analyzer
+# Run the complete setup script
+bash setup.sh
 ```
 
-### 2. Create virtual environment
-
+### Option 2: Manual Setup
+1. **Setup Environment**:
 ```bash
-python3 -m venv venv
-source venv/bin/activate   # Linux/Mac
-venv\Scripts\activate      # Windows
+   python setup/setup_secure.py
 ```
 
-### 3. Install dependencies
+2. **Configure API Keys**:
+   Edit `.env` file with your API keys:
+   - `GEMINI_API_KEY`: Get from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - `SERPER_API_KEY`: Get from [Serper](https://serper.dev/)
 
+3. **Start Services**:
 ```bash
-pip install --no-cache-dir -r requirements.txt
-```
+   # Terminal 1: Start Redis
+   redis-server
+   
+   # Terminal 2: Start API Server
+   uvicorn main:app --host 127.0.0.1 --port 8000
+   
+   # Terminal 3: Start Worker
+   celery -A celery_app worker --loglevel=info
+   ```
 
-### 4. Environment variables
-
-Create a `.env` file (see `.env.example`):
-
-```env
-# Choose your LLM backend
-GEMINI_API_KEY=your-gemini-key
-OPENAI_API_KEY=your-openai-key
-# Or use Ollama (no key needed if running locally)
-DATABASE_URL=sqlite:///./analysis.db   # or Supabase/Postgres URL
-REDIS_URL=redis://localhost:6379/0     # optional, for queue worker
-```
-
-### 5. Run FastAPI server
-
+4. **Test the System**:
 ```bash
-uvicorn main:app --reload
+   python tests/test_api.py
+   ```
+
+###  Documentation
+- **Complete Setup Guide**: [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md)
+- **Quick Start Guide**: [docs/QUICK_START.md](docs/QUICK_START.md)
+- **Troubleshooting Guide**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
+##  Project Structure
+
+```
+financial-document-analyzer-debug/
+├── main.py                 # FastAPI application
+├── models.py              # Database models
+├── celery_app.py          # Celery configuration
+├── worker_tasks.py        # Background tasks
+├── crew_runner.py         # Crew execution logic
+├── agents.py              # AI agents
+├── tools.py               # Analysis tools
+├── task.py                # Task definitions
+├── requirements.txt       # Dependencies
+├── .env                   # Environment variables
+├── setup/                 # Setup scripts
+│   ├── setup_secure.py
+│   ├── init_db.py
+│   └── env_template.txt
+├── scripts/               # Utility scripts
+│   ├── start_services.sh
+│   ├── process_pending.py
+│   └── debug_connections.py
+├── tests/                 # Test files
+│   ├── test_api.py
+│   └── test_integration.py
+└── docs/                  # Documentation
+    ├── README_SETUP.md
+    ├── QUICK_START.md
+    └── TROUBLESHOOTING.md
 ```
 
-App will run at:
-👉 [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-👉 Interactive docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+##  API Endpoints
 
----
+- `POST /analyze` - Upload and analyze document
+- `POST /analyze-default` - Analyze sample document
+- `GET /analyses` - List all analyses with IDs
+- `GET /status/{id}` - Check analysis status
+- `GET /result/{id}` - Get analysis results
+- `GET /health` - Health check
 
-## 📡 API Documentation
+##  Development
 
-### Health check
+- **Database**: SQLite (default) or PostgreSQL/Supabase
+- **Queue**: Redis + Celery
+- **AI**: CrewAI with Gemini
+- **API**: FastAPI
+- **Storage**: Local files + Database
 
-```bash
-curl http://127.0.0.1:8000/
-```
+##  License
 
-Response:
-
-```json
-{"message": "Financial Document Analyzer API is running"}
-```
-
----
-
-### Analyze document (upload a PDF)
-
-```bash
-curl -X POST "http://127.0.0.1:8000/analyze" \
-  -F "file=@data/sample.pdf" \
-  -F "query=Summarize key financial highlights"
-```
-
-Response:
-
-```json
-{
-  "status": "success",
-  "query": "Summarize key financial highlights",
-  "analysis": "... AI generated output ...",
-  "file_processed": "sample.pdf",
-  "file_source": "uploaded"
-}
-```
-
----
-
-### Analyze default document
-
-```bash
-curl -X POST "http://127.0.0.1:8000/analyze" \
-  -F "query=Summarize key financial highlights"
-```
-
-Response:
-
-```json
-{
-  "status": "success",
-  "query": "Summarize key financial highlights",
-  "analysis": "...",
-  "file_processed": "sample.pdf",
-  "file_source": "default"
-}
-```
----
-
-## 🎁 Bonus Features (Optional)
-
-* **Queue Worker Model**: Celery + Redis for concurrent requests
-* **Database Integration**: Store results in SQLite/Postgres/Supabase
-* **Extensible Agents**: Easily add more roles/tools
-
----
-
-## 📌 Notes
-
-* Requires Python 3.11+
-* Works with Gemini (`gemini-2.0-flash`) or local Ollama models (lighter ones like `phi3:mini` recommended if RAM is limited).
-* API is stateless; for production you should run with Postgres + Celery worker for scaling.
-
----
-
-## 🧑‍💻 Bugs Fixed Documentation
-
-Detailed bug list with explanations is available in [BUGFIXES.md](./BUGFIXES.md).
-
----
+MIT License

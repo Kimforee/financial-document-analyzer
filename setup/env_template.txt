@@ -1,0 +1,52 @@
+# Financial Document Analyzer - Environment Configuration Template
+# Copy this file to .env and fill in your actual values
+
+# ===========================================
+# DATABASE CONFIGURATION
+# ===========================================
+
+# Option 1: SQLite (Recommended for local development)
+# No setup required, works out of the box
+DATABASE_URL=sqlite:///./financial_analyzer.db
+
+# Option 2: Supabase (Cloud database)
+# Replace YOUR_PASSWORD with your actual Supabase password
+# DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.rfasmwqcncaxplrvgpzu.supabase.co:5432/postgres
+
+# Option 3: Supabase with SSL (if needed)
+# DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.rfasmwqcncaxplrvgpzu.supabase.co:5432/postgres?sslmode=require
+
+# ===========================================
+# REDIS CONFIGURATION
+# ===========================================
+REDIS_URL=redis://localhost:6379/0
+
+# ===========================================
+# CELERY CONFIGURATION
+# ===========================================
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
+
+# ===========================================
+# API KEYS (REQUIRED)
+# ===========================================
+
+# Gemini API Key (Required for AI analysis)
+# Get from: https://makersuite.google.com/app/apikey
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Serper API Key (Required for web search)
+# Get from: https://serper.dev/
+SERPER_API_KEY=your_serper_api_key_here
+
+# ===========================================
+# APPLICATION CONFIGURATION
+# ===========================================
+DEBUG=True
+SECRET_KEY=your_secret_key_here
+
+# ===========================================
+# FILE STORAGE
+# ===========================================
+OUTPUT_DIR=output
+DATA_DIR=data
